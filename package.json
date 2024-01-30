@@ -1,10 +1,9 @@
 {
     "name": "regex-highlight-comments",
-    "displayName": "Regex Hightlight Comments",
-    "icon": "icon.png",
+    "displayName": "Regex Highlight Comments",
     "description": "Highlight comments in vscode using regex",
-    "version": "0.0.1",
-    "publisher": "crayon-112",
+    "version": "0.0.2",
+    "publisher": "Crayon112",
     "author": {
         "name": "Crayon112"
     },
@@ -109,7 +108,7 @@
         "tslint": "^6.1.3",
         "typescript": "^4.6.3",
         "util": "^0.12.4",
-        "vsce": "^2.10.0",
+        "vsce": "^2.15.0",
         "webpack": "^5.74.0",
         "webpack-cli": "^4.10.0"
     }
