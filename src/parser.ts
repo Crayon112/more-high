@@ -81,7 +81,7 @@ export class Parser {
         }
     }
 
-        /**
+    /**
      * @param activeEditor The active text editor containing the code document.
      * @param regexes The pattern to find
      */
