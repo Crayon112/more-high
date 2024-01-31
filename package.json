@@ -2,7 +2,7 @@
     "name": "regex-highlight-comments",
     "displayName": "Regex Highlight Comments",
     "description": "Highlight comments in vscode using regex",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "publisher": "Crayon112",
     "author": {
         "name": "Crayon112"
