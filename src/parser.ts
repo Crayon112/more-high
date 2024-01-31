@@ -17,8 +17,8 @@ export class Parser {
     private configuration: Configuration;
 
     /**
-     * Creates a new instance of the Parser class
-     * @param configuration 
+     * Creates a new instance of the Parser class.
+     * @param configuration
      */
     public constructor(config: Configuration) {
 
@@ -29,6 +29,9 @@ export class Parser {
         this.initHighlightComments();
     }
 
+    /** 
+     * Load parameters from configuration.
+    */
     public LoadConfigurationParameters() {
         this.configuration.LoadLanguageContributions(this.contributions);
         this.ignoreFirstLine = this.contributions.ignoreFistLine;
@@ -36,8 +39,8 @@ export class Parser {
     }
 
     /**
-     * Apply decorations after finding all relevant comments
-     * @param activeEditor The active text editor containing the code document
+     * Apply decorations after finding all relevant comments.
+     * @param activeEditor The active text editor containing the code document.
      */
     public ApplyDecorations(activeEditor: vscode.TextEditor): void {
         // FIXME: The order to render
@@ -50,7 +53,7 @@ export class Parser {
     }
 
     /**
-     * Sets the highlighting tags up for use by the parser
+     * Sets the highlighting comments up for use by the parser.
      */
     private initHighlightComments(): void {
         let items = this.contributions.comments || [];
@@ -83,7 +86,7 @@ export class Parser {
 
     /**
      * @param activeEditor The active text editor containing the code document.
-     * @param regexes The pattern to find
+     * @param regexes The patterns to search.
      */
     public FindComments(activeEditor: vscode.TextEditor, regexes: RegExp[]) {
         let text = activeEditor.document.getText();
@@ -108,6 +111,11 @@ export class Parser {
         return comments;
     }
 
+    /** Finf all single line comments.
+     * 
+     * @param activeEditor 
+     * @returns 
+     */
     public FindSingleLineComments(activeEditor: vscode.TextEditor): any[] {
         let language = activeEditor.document.languageId;
         let config = this.configuration.GetCommentConfiguration(language);
