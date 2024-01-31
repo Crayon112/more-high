@@ -1,6 +1,12 @@
 import * as vscode from 'vscode';
 import { Configuration } from './configuration';
 
+// Matched comments
+interface MatchedComment {
+    range: vscode.Range;
+    content: string;
+}
+
 export class Parser {
     private highlightComments: HighlightComment[] = [];
 
@@ -88,7 +94,7 @@ export class Parser {
      * @param activeEditor The active text editor containing the code document.
      * @param regexes The patterns to search.
      */
-    public FindComments(activeEditor: vscode.TextEditor, regexes: RegExp[]) {
+    public FindComments(activeEditor: vscode.TextEditor, regexes: RegExp[]): MatchedComment[] {
         let text = activeEditor.document.getText();
 
         let comments = [];
@@ -114,9 +120,9 @@ export class Parser {
     /** Finf all single line comments.
      * 
      * @param activeEditor 
-     * @returns 
+     * @returns all matched comments
      */
-    public FindSingleLineComments(activeEditor: vscode.TextEditor): any[] {
+    public FindSingleLineComments(activeEditor: vscode.TextEditor): MatchedComment[] {
         let language = activeEditor.document.languageId;
         let config = this.configuration.GetCommentConfiguration(language);
         if (!config){
@@ -131,7 +137,12 @@ export class Parser {
         return this.FindComments(activeEditor, regexes);
     }
 
-    public FindMultiLineComments(activeEditor: vscode.TextEditor): any[] {
+    /** Finf all multiple line comments.
+     * 
+     * @param activeEditor 
+     * @returns all matched comments
+     */
+    public FindMultiLineComments(activeEditor: vscode.TextEditor): MatchedComment[] {
         let language = activeEditor.document.languageId;
         let config = this.configuration.GetCommentConfiguration(language);
         if (!config){
@@ -146,12 +157,20 @@ export class Parser {
         return this.FindComments(activeEditor, regexes);
     }
 
+    /**
+     * Add all comments should be highlighted into `highlightComments`
+     * @param activeEditor 
+     */
     public HighLightComments(activeEditor: vscode.TextEditor){
         // ! Can not change the order
         this.HighLightMultiLineComments(activeEditor);
         this.HighLightSingleLineComments(activeEditor);
     }
 
+    /**
+     * Add all multiple line comments should be highlighted into `highlightComments`
+     * @param activeEditor 
+     */
     public HighLightMultiLineComments(activeEditor: vscode.TextEditor){
         if (!this.highlightMultiLineComments){
             return;
@@ -171,6 +190,10 @@ export class Parser {
         }
     }
 
+    /**
+     * Add all single line comments should be highlighted into `highlightComments`
+     * @param activeEditor 
+     */
     public HighLightSingleLineComments(activeEditor: vscode.TextEditor){
         if (!this.highlightSingleLineComments){
             return;

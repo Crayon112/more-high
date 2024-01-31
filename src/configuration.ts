@@ -2,7 +2,14 @@ export class Configuration {
     private commentConfig = new Map<string, CommentConfig>([
     ]);
 
+    /**
+     * Load parameters from contributions
+     * @param contributions
+     */
     public LoadLanguageContributions(contributions: Contributions) {
+        // Clear all default configurations.
+        this.commentConfig.clear();
+
         let languages = new Map(Object.entries(contributions.languages));
         for (let language of Object.keys(contributions.languages)) {
             let config = this.commentConfig.get(language);
