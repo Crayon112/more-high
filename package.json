@@ -59,6 +59,77 @@
                     "description": "Whether the first line comment should be highlighted",
                     "default": false
                 },
+                "regex-highlight-comments.languages": {
+                    "type": "object",
+                    "description": "Comments grammar using regex",
+                    "default": {
+                        "python": [
+                            {
+                                "type": "single",
+                                "mode": "mg",
+                                "regex": "^\\s*#(.*?)$"
+                            },
+                            {
+                                "type": "multiple",
+                                "mode": "smg",
+                                "regex": "'''(.*?)'''"
+                            },
+                            {
+                                "type": "multiple",
+                                "mode": "smg",
+                                "regex": "\"\"\"(.*?)\"\"\""
+                            }
+                        ],
+                        "c": [
+                            {
+                                "type": "single",
+                                "mode": "mg",
+                                "regex": "^\\s*\/\/(.*?)$"
+                            },
+                            {
+                                "type": "multiple",
+                                "mode": "smg",
+                                "regex": "\/\\*(.*?)\\*\/"
+                            }
+                        ],
+                        "c++": [
+                            {
+                                "type": "single",
+                                "mode": "mg",
+                                "regex": "^\\s*\/\/(.*?)$"
+                            },
+                            {
+                                "type": "multiple",
+                                "mode": "smg",
+                                "regex": "\/\\*(.*?)\\*\/"
+                            }
+                        ],
+                        "javascript": [
+                            {
+                                "type": "single",
+                                "mode": "mg",
+                                "regex": "^\\s*\/\/(.*?)$"
+                            },
+                            {
+                                "type": "multiple",
+                                "mode": "smg",
+                                "regex": "\/\\*(.*?)\\*\/"
+                            }
+                        ],
+                        "typescript": [
+                            {
+                                "type": "single",
+                                "mode": "mg",
+                                "regex": "^\\s*\/\/(.*?)$"
+                            },
+                            {
+                                "type": "multiple",
+                                "mode": "smg",
+                                "regex": "\/\\*(.*?)\\*\/"
+                            }
+                        ]
+                    }
+                },
                 "regex-highlight-comments.comments": {
                     "type": "array",
                     "description": "Regexes which are used to color the comments. Changes require a restart of VS Code to take effect",

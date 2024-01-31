@@ -24,12 +24,13 @@ export class Parser {
 
         this.configuration = config;
 
-        this.loadConfigurationParameters();
+        this.LoadConfigurationParameters();
 
         this.initHighlightComments();
     }
 
-    private loadConfigurationParameters() {
+    public LoadConfigurationParameters() {
+        this.configuration.LoadLanguageContributions(this.contributions);
         this.ignoreFirstLine = this.contributions.ignoreFistLine;
         this.highlightMultiLineComments = this.contributions.highlightMultiLine;
     }
@@ -39,6 +40,7 @@ export class Parser {
      * @param activeEditor The active text editor containing the code document
      */
     public ApplyDecorations(activeEditor: vscode.TextEditor): void {
+        // FIXME: The order to render
         for (let comment of this.highlightComments) {
             activeEditor.setDecorations(comment.decoration, comment.ranges);
 
@@ -81,24 +83,26 @@ export class Parser {
 
         /**
      * @param activeEditor The active text editor containing the code document.
-     * @param regex The pattern to find
+     * @param regexes The pattern to find
      */
-    public FindComments(activeEditor: vscode.TextEditor, regex: RegExp) {
+    public FindComments(activeEditor: vscode.TextEditor, regexes: RegExp[]) {
         let text = activeEditor.document.getText();
 
         let comments = [];
 
         let match: any;
-        while (match = regex.exec(text)) {
-            let startPos = activeEditor.document.positionAt(match.index);
-            let endPos = activeEditor.document.positionAt(match.index + match[0].length);
-            let range = new vscode.Range(startPos, endPos);
+        for (let regex of regexes) {
+            while (match = regex.exec(text)) {
+                let startPos = activeEditor.document.positionAt(match.index);
+                let endPos = activeEditor.document.positionAt(match.index + match[0].length);
+                let range = new vscode.Range(startPos, endPos);
 
-            if (this.ignoreFirstLine && startPos.line === 0 && startPos.character === 0) {
-                continue;
+                if (this.ignoreFirstLine && startPos.line === 0 && startPos.character === 0) {
+                    continue;
+                }
+
+                comments.push({ "range": range, "content": match[match.length - 1] });
             }
-
-            comments.push({ "range": range, "content": match[match.length - 1] });
         }
 
         return comments;
@@ -111,12 +115,12 @@ export class Parser {
             return [];
         }
 
-        let regex = config.commentSingleLineRegex;
-        if (!regex) {
+        let regexes = config.commentSingleLineRegex;
+        if (!regexes) {
             return [];
         }
-        
-        return this.FindComments(activeEditor, regex);
+
+        return this.FindComments(activeEditor, regexes);
     }
 
     public FindMultiLineComments(activeEditor: vscode.TextEditor): any[] {
@@ -126,12 +130,12 @@ export class Parser {
             return [];
         }
 
-        let regex = config.commentMultiLineRegex;
-        if (!regex) {
+        let regexes = config.commentMultiLineRegex;
+        if (!regexes) {
             return [];
         }
 
-        return this.FindComments(activeEditor, regex);
+        return this.FindComments(activeEditor, regexes);
     }
 
     public HighLightComments(activeEditor: vscode.TextEditor){
@@ -152,7 +156,7 @@ export class Parser {
                 
                 let content = comment.content.split('\n').join('');
                 if (regex.test(content)) {
-                    highlightComment.ranges.push({"range": comment.range});
+                    highlightComment.ranges.push(comment.range);
                     break;
                 }
             }
@@ -169,12 +173,13 @@ export class Parser {
         for (let comment of comments) {
             let parts = comment.content.split('\n');
             let start = comment.range.start.translate(0, -comment.range.start.character);
-            for (let part of parts) {
+            start = start.translate(1, 0);
+            for (let part of parts.slice(1, parts.length)) {
                 for (let highlightComment of this.highlightComments) {
                     let regex = new RegExp(highlightComment.regex);
                     if (regex.test(part)) {
                         let range_ = new vscode.Range(start, start.translate(0, part.length));
-                        highlightComment.ranges.push({"range": range_});
+                        highlightComment.ranges.push(range_);
                        break;
                     }
                 }
@@ -187,10 +192,11 @@ export class Parser {
             for (let highlightComment of this.highlightComments) {
                 let regex = new RegExp(highlightComment.regex);
                 if (regex.test(comment.content)) {
-                    highlightComment.ranges.push({"range": comment.range});
+                    highlightComment.ranges.push(comment.range);
                     break;
                 }
             }
         }
+
     }
 }

@@ -1,9 +1,44 @@
 export class Configuration {
-    private readonly commentConfig = new Map<string, CommentConfig|undefined>([
-        ["C", { commentSingleLineRegex: /^\s*\/\/(.*?)$/mg, commentMultiLineRegex: /\/\*(.*?)\*\//smg }],
-        ["python", { commentSingleLineRegex: /^\s*#(.*?)$/mg, commentMultiLineRegex: /(?:(?:''')|(?:"""))(.*?)(?:(?:''')|(?:"""))/smg }]
+    private commentConfig = new Map<string, CommentConfig>([
     ]);
-    
+
+    public LoadLanguageContributions(contributions: Contributions) {
+        let languages = new Map(Object.entries(contributions.languages));
+        for (let language of Object.keys(contributions.languages)) {
+            let config = this.commentConfig.get(language);
+
+            if (config) {
+                let asts = languages.get(language) || [];
+                for (let ast of asts) {
+                    let { type, mode, regex } = ast;
+                    let r = new RegExp(regex, mode);
+                    if (type === "multiple") {
+                        config.commentMultiLineRegex.push(r)
+                    } else if (type === "single") {
+                        config.commentSingleLineRegex.push(r)
+                    }
+                }
+            } else {
+                config = {
+                    "commentSingleLineRegex": [],
+                    "commentMultiLineRegex": [],
+                };
+                this.commentConfig.set(language, config);
+
+                let asts = languages.get(language) || [];
+                for (let ast of asts) {
+                    let { type, mode, regex } = ast;
+                    let r = new RegExp(regex, mode);
+                    if (type === "multiple") {
+                        config.commentMultiLineRegex.push(r)
+                    } else if (type === "single") {
+                        config.commentSingleLineRegex.push(r)
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Gets the configuration information for the specified language
      * @param languageCode 

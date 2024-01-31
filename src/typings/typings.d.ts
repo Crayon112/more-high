@@ -4,6 +4,12 @@ interface HighlightComment {
     ranges: Array<any>;
 }
 
+interface CommentRegex {
+    type: string;
+    mode: string,
+    regex: string
+}
+
 interface Contributions {
     ignoreFistLine: boolean;
     highlightMultiLine: boolean;
@@ -16,9 +22,10 @@ interface Contributions {
         italic: boolean;
         backgroundColor: string;
     }];
+    languages: Map<string, CommentRegex[] >
 }
 
 interface CommentConfig {
-    commentSingleLineRegex?: RegExp;
-    commentMultiLineRegex?: RegExp;
+    commentSingleLineRegex: RegExp[];
+    commentMultiLineRegex: RegExp[];
 }
