@@ -1,23 +1,23 @@
 import * as vscode from 'vscode';
 import { Configuration } from './configuration';
 
-// Matched comments
-interface MatchedComment {
+// Matched highlight
+interface MatchedHighlight {
     range: vscode.Range;
     content: string;
 }
 
 export class Parser {
-    private highlightComments: HighlightComment[] = [];
+    private highlights: Highlight[] = [];
 
-    private highlightSingleLineComments = true;
-    private highlightMultiLineComments = true;
+    private enableSingleLine = true;
+    private enableMultipleLine = true;
 
     // * this is used to prevent the first line of the file (specifically python) from coloring like other comments
     private ignoreFirstLine = false;
 
     // Read from the package.json
-    private contributions: Contributions = vscode.workspace.getConfiguration('regex-highlight-comments') as any;
+    private contributions: Contributions = vscode.workspace.getConfiguration('more-high') as any;
 
     // The configuration necessary to find supported languages on startup
     private configuration: Configuration;
@@ -32,7 +32,7 @@ export class Parser {
 
         this.LoadConfigurationParameters();
 
-        this.initHighlightComments();
+        this.initHighlights();
     }
 
     /** 
@@ -41,28 +41,28 @@ export class Parser {
     public LoadConfigurationParameters() {
         this.configuration.LoadLanguageContributions(this.contributions);
         this.ignoreFirstLine = this.contributions.ignoreFistLine;
-        this.highlightMultiLineComments = this.contributions.highlightMultiLine;
+        this.enableMultipleLine = this.contributions.enableMultipleLine;
     }
 
     /**
-     * Apply decorations after finding all relevant comments.
+     * Apply decorations after finding all relevant highlights.
      * @param activeEditor The active text editor containing the code document.
      */
     public ApplyDecorations(activeEditor: vscode.TextEditor): void {
         // FIXME: The order to render
-        for (let comment of this.highlightComments) {
-            activeEditor.setDecorations(comment.decoration, comment.ranges);
+        for (let highlight of this.highlights) {
+            activeEditor.setDecorations(highlight.decoration, highlight.ranges);
 
             // clear the ranges for the next pass
-            comment.ranges.length = 0;
+            highlight.ranges.length = 0;
         }
     }
 
     /**
-     * Sets the highlighting comments up for use by the parser.
+     * Sets the highlighting highlights up for use by the parser.
      */
-    private initHighlightComments(): void {
-        let items = this.contributions.comments || [];
+    private initHighlights(): void {
+        let items = this.contributions.highlights || [];
         for (let item of items) {
             let options: vscode.DecorationRenderOptions = {
                 color: item.color, backgroundColor: item.backgroundColor
@@ -82,7 +82,7 @@ export class Parser {
                 options.fontStyle = "italic";
             }
 
-            this.highlightComments.push({
+            this.highlights.push({
                 regex: '^' + item.regex + '$',
                 ranges: [],
                 decoration: vscode.window.createTextEditorDecorationType(options)
@@ -94,10 +94,10 @@ export class Parser {
      * @param activeEditor The active text editor containing the code document.
      * @param regexes The patterns to search.
      */
-    public FindComments(activeEditor: vscode.TextEditor, regexes: RegExp[]): MatchedComment[] {
+    public FindHighlights(activeEditor: vscode.TextEditor, regexes: RegExp[]): MatchedHighlight[] {
         let text = activeEditor.document.getText();
 
-        let comments = [];
+        let highlights = [];
 
         let match: any;
         for (let regex of regexes) {
@@ -110,80 +110,80 @@ export class Parser {
                     continue;
                 }
 
-                comments.push({ "range": range, "content": match[match.length - 1] });
+                highlights.push({ "range": range, "content": match[match.length - 1] });
             }
         }
 
-        return comments;
+        return highlights;
     }
 
-    /** Finf all single line comments.
+    /** Finf all single line highlights.
      * 
      * @param activeEditor 
-     * @returns all matched comments
+     * @returns all matched highlights
      */
-    public FindSingleLineComments(activeEditor: vscode.TextEditor): MatchedComment[] {
+    public FindSingleLineHighlights(activeEditor: vscode.TextEditor): MatchedHighlight[] {
         let language = activeEditor.document.languageId;
         let config = this.configuration.GetCommentConfiguration(language);
         if (!config){
             return [];
         }
 
-        let regexes = config.commentSingleLineRegex;
+        let regexes = config.singleLineRegex;
         if (!regexes) {
             return [];
         }
 
-        return this.FindComments(activeEditor, regexes);
+        return this.FindHighlights(activeEditor, regexes);
     }
 
-    /** Finf all multiple line comments.
+    /** Finf all multiple line highlights.
      * 
      * @param activeEditor 
-     * @returns all matched comments
+     * @returns all matched highilghts
      */
-    public FindMultiLineComments(activeEditor: vscode.TextEditor): MatchedComment[] {
+    public FindMultiLineHighlights(activeEditor: vscode.TextEditor): MatchedHighlight[] {
         let language = activeEditor.document.languageId;
         let config = this.configuration.GetCommentConfiguration(language);
         if (!config){
             return [];
         }
 
-        let regexes = config.commentMultiLineRegex;
+        let regexes = config.multipleLineRegex;
         if (!regexes) {
             return [];
         }
 
-        return this.FindComments(activeEditor, regexes);
+        return this.FindHighlights(activeEditor, regexes);
     }
 
     /**
-     * Add all comments should be highlighted into `highlightComments`
+     * Add all highlights should be highlighted into `highlights`
      * @param activeEditor 
      */
-    public HighLightComments(activeEditor: vscode.TextEditor){
+    public SearchHighLights(activeEditor: vscode.TextEditor){
         // ! Can not change the order
-        this.HighLightMultiLineComments(activeEditor);
-        this.HighLightSingleLineComments(activeEditor);
+        this.HighlightMultiLines(activeEditor);
+        this.HighlightSingleLines(activeEditor);
     }
 
     /**
-     * Add all multiple line comments should be highlighted into `highlightComments`
+     * Add all multiple line highlights should be highlighted into `highlights`
      * @param activeEditor 
      */
-    public HighLightMultiLineComments(activeEditor: vscode.TextEditor){
-        if (!this.highlightMultiLineComments){
+    public HighlightMultiLines(activeEditor: vscode.TextEditor){
+        if (!this.enableMultipleLine){
             return;
         }
 
-        let comments = this.FindMultiLineComments(activeEditor);
-        for (let comment of comments) {
-            for (let highlightComment of this.highlightComments) {
-                let regex = new RegExp(highlightComment.regex);
+        let matchedHighlights = this.FindMultiLineHighlights(activeEditor);
+        for (let matchHighlight of matchedHighlights) {
+            for (let highlight of this.highlights) {
+                let regex = new RegExp(highlight.regex);
                 
-                let content = comment.content.split('\n').join('');
+                let content = matchHighlight.content.split('\n').join('');
                 if (regex.test(content)) {
-                    highlightComment.ranges.push(comment.range);
+                    highlight.ranges.push(matchHighlight.range);
                     break;
                 }
             }
@@ -191,26 +191,26 @@ export class Parser {
     }
 
     /**
-     * Add all single line comments should be highlighted into `highlightComments`
+     * Add all single line highlights should be highlighted into `highlights`
      * @param activeEditor 
      */
-    public HighLightSingleLineComments(activeEditor: vscode.TextEditor){
-        if (!this.highlightSingleLineComments){
+    public HighlightSingleLines(activeEditor: vscode.TextEditor){
+        if (!this.enableSingleLine){
             return;
         }
 
-        // Process single line comments in multiple line comments
-        let comments = this.FindMultiLineComments(activeEditor);
-        for (let comment of comments) {
-            let parts = comment.content.split('\n');
-            let start = comment.range.start.translate(0, -comment.range.start.character);
+        // Process single line highlights in multiple line highlights
+        let matchedHighlights = this.FindMultiLineHighlights(activeEditor);
+        for (let mh of matchedHighlights) {
+            let parts = mh.content.split('\n');
+            let start = mh.range.start.translate(0, -mh.range.start.character);
             start = start.translate(1, 0);
             for (let part of parts.slice(1, parts.length)) {
-                for (let highlightComment of this.highlightComments) {
-                    let regex = new RegExp(highlightComment.regex);
+                for (let h of this.highlights) {
+                    let regex = new RegExp(h.regex);
                     if (regex.test(part)) {
                         let range_ = new vscode.Range(start, start.translate(0, part.length));
-                        highlightComment.ranges.push(range_);
+                        h.ranges.push(range_);
                        break;
                     }
                 }
@@ -218,12 +218,12 @@ export class Parser {
             }
         }
 
-        comments = this.FindSingleLineComments(activeEditor);
-        for (let comment of comments) {
-            for (let highlightComment of this.highlightComments) {
-                let regex = new RegExp(highlightComment.regex);
+        matchedHighlights = this.FindSingleLineHighlights(activeEditor);
+        for (let comment of matchedHighlights) {
+            for (let h of this.highlights) {
+                let regex = new RegExp(h.regex);
                 if (regex.test(comment.content)) {
-                    highlightComment.ranges.push(comment.range);
+                    h.ranges.push(comment.range);
                     break;
                 }
             }

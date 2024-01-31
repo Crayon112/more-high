@@ -1,5 +1,5 @@
 export class Configuration {
-    private commentConfig = new Map<string, CommentConfig>([
+    private commentConfig = new Map<string, HighlightConfig>([
     ]);
 
     /**
@@ -10,36 +10,36 @@ export class Configuration {
         // Clear all default configurations.
         this.commentConfig.clear();
 
-        let languages = new Map(Object.entries(contributions.languages));
-        for (let language of Object.keys(contributions.languages)) {
+        let languages = new Map(Object.entries(contributions.languageSupports));
+        for (let language of Object.keys(contributions.languageSupports)) {
             let config = this.commentConfig.get(language);
 
             if (config) {
-                let asts = languages.get(language) || [];
-                for (let ast of asts) {
-                    let { type, mode, regex } = ast;
+                let regexes = languages.get(language) || [];
+                for (let regex_ of regexes) {
+                    let { type, mode, regex } = regex_;
                     let r = new RegExp(regex, mode);
                     if (type === "multiple") {
-                        config.commentMultiLineRegex.push(r)
+                        config.multipleLineRegex.push(r)
                     } else if (type === "single") {
-                        config.commentSingleLineRegex.push(r)
+                        config.singleLineRegex.push(r)
                     }
                 }
             } else {
                 config = {
-                    "commentSingleLineRegex": [],
-                    "commentMultiLineRegex": [],
+                    "singleLineRegex": [],
+                    "multipleLineRegex": [],
                 };
                 this.commentConfig.set(language, config);
 
-                let asts = languages.get(language) || [];
-                for (let ast of asts) {
-                    let { type, mode, regex } = ast;
+                let regexes = languages.get(language) || [];
+                for (let regex_ of regexes) {
+                    let { type, mode, regex } = regex_;
                     let r = new RegExp(regex, mode);
                     if (type === "multiple") {
-                        config.commentMultiLineRegex.push(r)
+                        config.multipleLineRegex.push(r)
                     } else if (type === "single") {
-                        config.commentSingleLineRegex.push(r)
+                        config.singleLineRegex.push(r)
                     }
                 }
             }
@@ -51,7 +51,7 @@ export class Configuration {
      * @param languageCode 
      * @returns 
      */
-    public GetCommentConfiguration(languageCode: string): CommentConfig | undefined {
+    public GetCommentConfiguration(languageCode: string): HighlightConfig | undefined {
 
         // * check if the language config has already been loaded
         if (this.commentConfig.has(languageCode)) {

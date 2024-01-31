@@ -1,22 +1,23 @@
 {
-    "name": "regex-highlight-comments",
-    "displayName": "Regex Highlight Comments",
-    "description": "Highlight comments in vscode using regex",
-    "version": "0.0.4",
+    "name": "more-high",
+    "displayName": "MoreHigh",
+    "description": "More highlights in vscode",
+    "version": "0.0.1",
+    "icon": "icon.png",
     "publisher": "Crayon112",
     "author": {
         "name": "Crayon112"
     },
-    "homepage": "https://github.com/Crayon112/regex-highlight-comments/blob/master/README.md",
+    "homepage": "https://github.com/Crayon112/more-high/blob/master/README.md",
     "license": "SEE LICENSE IN LICENSE.md",
     "repository": {
         "type": "git",
-        "url": "https://github.com/Crayon112/regex-highlight-comments"
+        "url": "https://github.com/Crayon112/more-high"
     },
     "sponsor": {
         "url": "https://github.com/sponsors/Crayon112"
     },
-    "bugs": "https://github.com/Crayon112/regex-highlight-comments/issues",
+    "bugs": "https://github.com/Crayon112/more-high/issues",
     "categories": [
         "Formatters"
     ],
@@ -47,21 +48,21 @@
     },
     "contributes": {
         "configuration": {
-            "title": "Regex Hightlight Comments configuration",
+            "title": "More highlights",
             "properties": {
-                "regex-highlight-comments.highlightMultiLine": {
+                "more-high.enableMultipleLine": {
                     "type": "boolean",
-                    "description": "Whether the multiline comment highlighter should be active",
+                    "description": "Whether the multiple line search enabled",
                     "default": true
                 },
-                "regex-highlight-comments.ignoreFirstLine": {
+                "more-high.ignoreFirstLine": {
                     "type": "boolean",
-                    "description": "Whether the first line comment should be highlighted",
+                    "description": "Whether the first line should be highlighted",
                     "default": false
                 },
-                "regex-highlight-comments.languages": {
+                "more-high.languageSupports": {
                     "type": "object",
-                    "description": "Comments grammar using regex",
+                    "description": "Regexes to search the items to be highlighted for different programming languages",
                     "default": {
                         "python": [
                             {
@@ -130,9 +131,9 @@
                         ]
                     }
                 },
-                "regex-highlight-comments.comments": {
+                "more-high.highlights": {
                     "type": "array",
-                    "description": "Regexes which are used to color the comments. Changes require a restart of VS Code to take effect",
+                    "description": "Highlights search by regex.",
                     "default": [
                         {
                             "regex": "\\s*\\!.*",

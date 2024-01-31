@@ -14,14 +14,14 @@ export async function activate(context: vscode.ExtensionContext) {
         // if no active window is open, return
         if (!activeEditor) return;
 
-        // Finds the single line comments using the language comment delimiter
-        parser.HighLightComments(activeEditor);
+        // Finds the highlights
+        parser.SearchHighLights(activeEditor);
 
         // Apply the styles set in the package.json
         parser.ApplyDecorations(activeEditor);
     };
 
-    // Get the active editor for the first time and initialise the regex
+    // Get the active editor for the first time and initialization
     if (vscode.window.activeTextEditor) {
         activeEditor = vscode.window.activeTextEditor;
  

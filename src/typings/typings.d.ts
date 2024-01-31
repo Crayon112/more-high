@@ -1,10 +1,10 @@
-interface HighlightComment {
+interface Highlight {
     regex: string;
     decoration: any;
     ranges: Array<any>;
 }
 
-interface CommentRegex {
+interface HighlightRegex {
     type: string;
     mode: string,
     regex: string
@@ -12,8 +12,8 @@ interface CommentRegex {
 
 interface Contributions {
     ignoreFistLine: boolean;
-    highlightMultiLine: boolean;
-    comments: [{
+    enableMultipleLine: boolean;
+    highlights: [{
         regex: string;
         color: string;
         strikethrough: boolean;
@@ -22,10 +22,10 @@ interface Contributions {
         italic: boolean;
         backgroundColor: string;
     }];
-    languages: Map<string, CommentRegex[] >
+    languageSupports: Map<string, HighlightRegex[] >
 }
 
-interface CommentConfig {
-    commentSingleLineRegex: RegExp[];
-    commentMultiLineRegex: RegExp[];
+interface HighlightConfig {
+    singleLineRegex: RegExp[];
+    multipleLineRegex: RegExp[];
 }
