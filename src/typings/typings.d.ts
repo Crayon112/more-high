@@ -22,10 +22,10 @@ interface Contributions {
         italic: boolean;
         backgroundColor: string;
     }];
-    languageSupports: Map<string, HighlightRegex[] >
+    languageSupports: Map<string, HighlightRegex[]>
 }
 
-interface HighlightConfig {
+interface SearchHighlightConfig {
     singleLineRegex: RegExp[];
     multipleLineRegex: RegExp[];
 }

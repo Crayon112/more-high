@@ -1,6 +1,5 @@
 export class Configuration {
-    private commentConfig = new Map<string, HighlightConfig>([
-    ]);
+    private languageContributions = new Map<string, SearchHighlightConfig>();
 
     /**
      * Load parameters from contributions
@@ -8,41 +7,27 @@ export class Configuration {
      */
     public LoadLanguageContributions(contributions: Contributions) {
         // Clear all default configurations.
-        this.commentConfig.clear();
+        this.languageContributions.clear();
 
-        let languages = new Map(Object.entries(contributions.languageSupports));
-        for (let language of Object.keys(contributions.languageSupports)) {
-            let config = this.commentConfig.get(language);
-
-            if (config) {
-                let regexes = languages.get(language) || [];
-                for (let regex_ of regexes) {
-                    let { type, mode, regex } = regex_;
-                    let r = new RegExp(regex, mode);
-                    if (type === "multiple") {
-                        config.multipleLineRegex.push(r)
-                    } else if (type === "single") {
-                        config.singleLineRegex.push(r)
-                    }
-                }
-            } else {
-                config = {
-                    "singleLineRegex": [],
-                    "multipleLineRegex": [],
-                };
-                this.commentConfig.set(language, config);
-
-                let regexes = languages.get(language) || [];
-                for (let regex_ of regexes) {
-                    let { type, mode, regex } = regex_;
-                    let r = new RegExp(regex, mode);
-                    if (type === "multiple") {
-                        config.multipleLineRegex.push(r)
-                    } else if (type === "single") {
-                        config.singleLineRegex.push(r)
-                    }
+        let languageSupports = new Map(Object.entries(contributions.languageSupports)) as Map<string, HighlightRegex[]>;
+        for (let language of languageSupports.keys()) {
+            let toSearches = this.languageContributions.get(language);
+            if (!toSearches){
+                toSearches = {"singleLineRegex": [], "multipleLineRegex": []}
+            }
+            
+            let regexes = languageSupports.get(language) || [];
+            for (let regex_ of regexes) {
+                let { type, mode, regex } = regex_;
+                let r = new RegExp(regex, mode);
+                if (type === "multiple") {
+                    toSearches.multipleLineRegex.push(r)
+                } else if (type === "single") {
+                    toSearches.singleLineRegex.push(r)
                 }
             }
+
+            this.languageContributions.set(language, toSearches);
         }
     }
 
@@ -51,11 +36,11 @@ export class Configuration {
      * @param languageCode 
      * @returns 
      */
-    public GetCommentConfiguration(languageCode: string): HighlightConfig | undefined {
+    public GetCommentConfiguration(languageCode: string): SearchHighlightConfig | undefined {
 
         // * check if the language config has already been loaded
-        if (this.commentConfig.has(languageCode)) {
-            return this.commentConfig.get(languageCode);
+        if (this.languageContributions.has(languageCode)) {
+            return this.languageContributions.get(languageCode);
         }
 
         return undefined;
